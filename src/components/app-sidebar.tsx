@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Check, ChevronsUpDown, LogOut, Plus, Search, UserRound } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Check, ChevronsUpDown, LogOut, Search } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -28,11 +28,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { currentUser, currentWorkspace, workspaces } from "@/lib/demo-data"
+import { signOut } from "@/components/sign-out-button"
 import { navGroups } from "@/lib/nav"
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  workspaceName: string
+  userName: string
+  userEmail: string
+  initials: string
+}
+
+export function AppSidebar({ workspaceName, userName, userEmail, initials }: AppSidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [query, setQuery] = React.useState("")
 
   const filteredGroups = navGroups
@@ -101,41 +109,31 @@ export function AppSidebar() {
               <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
                 <Avatar className="size-8 rounded-md">
                   <AvatarFallback className="rounded-md bg-accent text-xs font-medium text-accent-foreground">
-                    {currentUser.initials}
+                    {initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left leading-tight">
                   <span className="truncate text-sm font-medium text-foreground">
-                    {currentWorkspace.name}
+                    {workspaceName}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {currentUser.name}
+                    {userName}
                   </span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="min-w-60">
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-                  {workspaces.map((workspace) => (
-                    <DropdownMenuItem key={workspace.id}>
-                      <span className="flex-1">{workspace.name}</span>
-                      {workspace.id === currentWorkspace.id && <Check className="size-4" />}
-                    </DropdownMenuItem>
-                  ))}
+                  <DropdownMenuLabel>Workspace</DropdownMenuLabel>
                   <DropdownMenuItem>
-                    <Plus className="size-4" />
-                    New workspace
+                    <span className="flex-1">{workspaceName}</span>
+                    <Check className="size-4" />
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel>{currentUser.email}</DropdownMenuLabel>
-                  <DropdownMenuItem>
-                    <UserRound className="size-4" />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuLabel>{userEmail}</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => signOut(router)}>
                     <LogOut className="size-4" />
                     Log out
                   </DropdownMenuItem>

@@ -10,17 +10,16 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { currentWorkspace } from "@/lib/demo-data"
 import { allNavItems } from "@/lib/nav"
 
-export function AppBreadcrumbs() {
+export function AppBreadcrumbs({ workspaceName }: { workspaceName: string }) {
   const pathname = usePathname()
   const page = allNavItems.find((item) => item.href === pathname)
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem className="hidden sm:inline-flex">{currentWorkspace.name}</BreadcrumbItem>
+        <BreadcrumbItem className="hidden sm:inline-flex">{workspaceName}</BreadcrumbItem>
         <BreadcrumbSeparator className="hidden sm:inline-flex" />
         {page && (
           <>

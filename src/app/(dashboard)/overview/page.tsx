@@ -3,24 +3,27 @@ import { FileCheck2, ImageOff, Link2, ListChecks, type LucideIcon } from "lucide
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { currentUser, currentWorkspace, overviewStats, sponsors } from "@/lib/demo-data"
+import { getOverview } from "@/lib/overview"
+import { getWorkspace } from "@/lib/workspace"
 
 export const metadata: Metadata = { title: "Overview" }
 
-const stats: { label: string; icon: LucideIcon; value: number; detail: string }[] = [
-  { label: "Obligations due this week", icon: ListChecks, ...overviewStats.obligationsDueThisWeek },
-  { label: "Assets missing", icon: ImageOff, ...overviewStats.assetsMissing },
-  { label: "Upload links awaiting partners", icon: Link2, ...overviewStats.uploadLinksAwaiting },
-  { label: "Proof collected", icon: FileCheck2, ...overviewStats.proofCollected },
-]
+export default async function OverviewPage() {
+  const workspace = await getWorkspace()
+  const { stats: s, partners } = await getOverview(workspace.organisation!.id)
+  const firstName = workspace.displayName.split(" ")[0]
 
-export default function OverviewPage() {
-  const firstName = currentUser.name.split(" ")[0]
+  const stats: { label: string; icon: LucideIcon; value: number; detail: string }[] = [
+    { label: "Obligations due this week", icon: ListChecks, ...s.obligationsDueThisWeek },
+    { label: "Assets missing", icon: ImageOff, ...s.assetsMissing },
+    { label: "Upload links awaiting partners", icon: Link2, ...s.uploadLinksAwaiting },
+    { label: "Proof collected", icon: FileCheck2, ...s.proofCollected },
+  ]
 
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <p className="text-sm text-muted-foreground">{currentWorkspace.name}</p>
+        <p className="text-sm text-muted-foreground">{workspace.organisation!.name}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Welcome back, {firstName}</h1>
       </div>
 
@@ -50,7 +53,7 @@ export default function OverviewPage() {
         </CardHeader>
         <CardContent className="px-0">
           <ul className="divide-y border-t">
-            {sponsors.map((sponsor) => (
+            {partners.map((sponsor) => (
               <li key={sponsor.id} className="flex items-center gap-4 px-4 py-3">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-medium text-muted-foreground">
                   {sponsor.name.split(" ").map((word) => word[0]).slice(0, 2).join("")}
@@ -62,9 +65,9 @@ export default function OverviewPage() {
                 <div className="hidden text-right text-xs text-muted-foreground sm:block">
                   {sponsor.delivered} delivered
                 </div>
-                {sponsor.openObligations > 0 ? (
+                {sponsor.open > 0 ? (
                   <Badge variant="secondary" className="tabular-nums">
-                    {sponsor.openObligations} open
+                    {sponsor.open} open
                   </Badge>
                 ) : (
                   <Badge variant="outline">Up to date</Badge>
