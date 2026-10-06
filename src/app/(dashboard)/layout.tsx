@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { getWorkspace } from "@/lib/workspace"
 
-// Reading the login cookie is per-request, so the shell streams in behind a loading state.
+// Data is read per request, so the shell streams in behind a loading state.
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<DashboardLoading />}>
@@ -31,7 +31,7 @@ function DashboardLoading() {
 async function DashboardShell({ children }: { children: React.ReactNode }) {
   const workspace = await getWorkspace()
 
-  if (!workspace.organisation) return <NoWorkspace email={workspace.email} />
+  if (!workspace.organisation) return <NoWorkspace />
 
   return (
     <SidebarProvider>

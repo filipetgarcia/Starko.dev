@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { Check, ChevronsUpDown, LogOut, Search } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Check, ChevronsUpDown, Search } from "lucide-react"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -28,7 +28,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { signOut } from "@/components/sign-out-button"
 import { navGroups } from "@/lib/nav"
 
 type AppSidebarProps = {
@@ -40,7 +39,6 @@ type AppSidebarProps = {
 
 export function AppSidebar({ workspaceName, userName, userEmail, initials }: AppSidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [query, setQuery] = React.useState("")
 
   const filteredGroups = navGroups
@@ -133,10 +131,6 @@ export function AppSidebar({ workspaceName, userName, userEmail, initials }: App
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>{userEmail}</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => signOut(router)}>
-                    <LogOut className="size-4" />
-                    Log out
-                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>

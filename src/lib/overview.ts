@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 const PLACEMENT_LABELS: Record<string, string> = {
   led: "LED boards",
@@ -24,9 +24,9 @@ type ObligationRow = {
 
 const isoDate = (d: Date) => d.toISOString().slice(0, 10)
 
-// Everything the Overview page shows, computed from the club's own rows (RLS scopes the queries).
+// Everything the Overview page shows, computed from the club's own rows.
 export async function getOverview(organisationId: string) {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const now = new Date()
 
   const [obligationsRes, partnersRes, linksRes, nextFixtureRes] = await Promise.all([

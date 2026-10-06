@@ -1,5 +1,5 @@
 -- Fictional demo data for Riverside FC. Safe to re-run: it rebuilds the demo workspace.
--- BEFORE RUNNING: replace YOUR_EMAIL@example.com below with the email you will log in with.
+-- The invite email below is only used once login is added; it can stay as it is for now.
 -- Dates are relative to today, so "this week" always has something due.
 
 do $$

@@ -1,46 +1,30 @@
 import { cache } from "react"
-import { redirect } from "next/navigation"
+import { connection } from "next/server"
 
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 export type Workspace = {
-  userId: string
-  email: string
   displayName: string
+  email: string
   initials: string
   organisation: { id: string; name: string; slug: string } | null
 }
 
-// The logged-in user and the club workspace they belong to. Cached per request.
-export const getWorkspace = cache(async (): Promise<Workspace> => {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect("/login")
+// MVP: no login. Everyone sees the demo club, picked by slug (default: Riverside FC).
+const DEMO_SLUG = process.env.DEMO_ORG_SLUG ?? "riverside-fc"
+const DEMO_USER = { displayName: "Sam Okafor", email: "sam@riversidefc.example", initials: "SO" }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("display_name, organisations(id, name, slug)")
-    .eq("user_id", user.id)
-    .order("created_at")
-    .limit(1)
+export const getWorkspace = cache(async (): Promise<Workspace> => {
+  await connection() // always read fresh data at request time
+
+  const supabase = createAdminClient()
+  const { data: organisation, error } = await supabase
+    .from("organisations")
+    .select("id, name, slug")
+    .eq("slug", DEMO_SLUG)
     .maybeSingle()
 
-  const email = user.email ?? ""
-  const displayName = (membership?.display_name as string | null) ?? email.split("@")[0]
-  const organisation = (membership?.organisations ?? null) as Workspace["organisation"]
+  if (error) throw new Error(error.message)
 
-  return {
-    userId: user.id,
-    email,
-    displayName,
-    initials: displayName
-      .split(/\s+/)
-      .map((part) => part[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase(),
-    organisation,
-  }
+  return { ...DEMO_USER, organisation }
 })
